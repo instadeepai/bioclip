@@ -1,0 +1,8 @@
+gnn_layer:
+  hidden_dimension: 32
+
+gnn_number_layers: 32 #32
+blocks: 8 #8
+
+stop_aggregation_gradient: false
+

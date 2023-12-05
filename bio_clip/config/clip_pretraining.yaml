@@ -1,0 +1,10 @@
+defaults:
+  - features: shared
+  - model: bioclip
+  - training: pretraining
+
+random_seed: 0
+
+model:
+  gnn:
+    stop_aggregation_gradient: false

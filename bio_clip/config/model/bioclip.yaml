@@ -1,0 +1,18 @@
+defaults:
+  - gnn: satorras_equivariant  # graph_transformer
+  - plm: esm2_t30_150M_UR50D
+
+architecture: "gnn"  # ["gnn", "graph_transformer"]
+
+remat_policy: "" # "checkpoint_dots"
+
+dimension_multimodal_space: 640 # 150
+temperature_initialization: 0.07
+
+sequence_embedding_type: "mean"
+final_hidden_layers: 2
+
+aggregation_attention:
+  num_heads: 4
+  key_size: 64
+  value_size: 128

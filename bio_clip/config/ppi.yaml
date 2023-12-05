@@ -1,0 +1,22 @@
+defaults:
+  - experiment
+
+# task specific config
+training:
+  num_epochs: 10
+  compute_mean_embedding: true
+
+  batch:
+    batch_size: 8 # num-devices * num_per_device_update
+    num_per_device_inference: 1
+    num_per_device_update: 1
+
+  data:
+    path: "/app/bio-clip/datasets/downstream/ppi"
+    benchmark: "cerevisiae"
+    protein_interaction: true
+    fixed_sizes:
+      maximum_padding: 1024
+
+  neptune:
+    project_name: 'PPI'

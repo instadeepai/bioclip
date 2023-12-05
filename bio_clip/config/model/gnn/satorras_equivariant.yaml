@@ -1,0 +1,19 @@
+stop_aggregation_gradient: true
+
+residue_embedding_dim: 640 # 64
+positional_encoding_dimension: 640 # 64
+
+# # the following are only used in:
+# #  [1] - bio_clip/model/old/graph_neural_network_layer.py
+# #  [2] - bio_clip/equidock/model/independent_equivariant_gm
+# skip_connection_weight: 0.25 # [1, 2]
+# leakyrelu_neg_slope: 0.01 # []
+# x_connection_init: 0.0 # [1, 2]
+# input_edge_features_dim: 27 # []
+
+gnn_number_layers: 3 # 28 # 8 # 5
+shared_layers: false
+
+gnn_layer:
+  layer_cls: "MPNNLayer"
+  hidden_dimension: 640 # (default) # 64

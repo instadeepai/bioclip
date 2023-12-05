@@ -1,0 +1,23 @@
+defaults:
+  - features: shared
+  - model: bioclip
+  - training: finetuning
+
+experiment_name: ''
+
+random_seed: 0
+cache_index: 0
+
+training:  # keep these config settings with no defaults
+  multilayer_classifier: true
+  use_projected_structure_embedding: false
+  optimise_everything_overide: false  # i.e. don't use the partition fn
+  # GNN
+  use_gnn_embedding: true
+  gnn_layer_to_use: -2  # [nolayers, after layer 1, layer 2, ..., layer n, mlp]; [gnn-input, l1, l2, l3, mlp-out]
+  first_trainable_gnn_layer: 0
+  load_bioclip_params: true
+  # ESM
+  use_esm_embedding: true
+  tune_esm: true
+  train_esm_from: 100 # the transformer block to train from, if negative it is from the end, set to >33 to not train esm

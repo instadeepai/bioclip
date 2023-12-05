@@ -1,0 +1,36 @@
+defaults:
+  - shared
+
+backend: "tpu"
+num_epochs: 30
+optimiser:
+  optimiser_type: "adamw"
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  num_acc_steps: 1 # TODO
+n_jobs: 96
+batch:
+  batch_size: 8 # num-devices * num_per_device_update
+  num_per_device_inference: 1
+  num_per_device_update: 1
+validation_frequency: 1
+
+mixed_precision: true
+
+data:
+  n_splits: 5 # Number of cross-validation splits
+  output_predictions_dir: 's3://deepchain-research/bio_clip/downstream_task_predictions'
+  endpoint: 'https://s3.kao.instadeep.io'
+
+checkpoints:
+  write:
+    resume: ''
+    checkpoint_base: 's3://deepchain-research/bio_clip/checkpoints/finetuning/'
+    aws_endpoint: ''
+    best_rel_path: "best_checkpoint"
+    latest_rel_path: "latest_checkpoint"
+    regular_rel_path: "step_{:d}"
+    latest_every: 1  # epoch
+    regular_every: 5  # epoch
+  checkpoint_dir: ''
+  aws_endpoint: "https://s3.kao.instadeep.io"

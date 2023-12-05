@@ -1,0 +1,16 @@
+residue_embedding_dim: 640
+positional_encoding_dimension: 640
+
+gnn_number_layers: 3
+shared_layers: false
+stop_aggregation_gradient: true
+
+gnn_layer:
+  layer_cls: "GATLayer"
+  num_intermediate_factor: 4
+  dropout_rate: 0.2
+  hidden_dimension: 512
+  num_heads: 4
+  key_size: 64
+  value_size: 128 # default in haiku is key_size
+  output_size: 512 # default in haiku is num_heads * key_size

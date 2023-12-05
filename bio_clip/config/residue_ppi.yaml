@@ -1,0 +1,44 @@
+defaults:
+  - experiment
+
+# task specific config
+training:
+  optimiser:
+    optimiser_type: "adamw" # copying pesto hyperparameters
+    learning_rate: 0.0005 # the one which was working was 0.005, but it doesn't look stable in training loss
+    learning_rate_from: 0.0005 # negative value means don't use schedule
+    learning_rate_switch_at: 7170 # (2 epochs)
+    learning_rate_to: 0.0001 # pesto hyperparameters didn't work- overfitting test only worked for high learning rate
+    weight_decay: 0.
+
+  batch:
+    batch_size: 8 # num-devices * num_per_device_update
+    num_per_device_inference: 1
+    num_per_device_update: 1
+  validation_frequency: 0.1 # must be an integer >= 1, OR an float in (0., 0.5]
+  validation_sets: ["test", "masif"]
+  resample_pdbs: false
+
+  num_epochs: 5
+  save_predictions_each_epoch: false
+  batch_size_esm_per_device: 1 # currently this must be 1 because of the way the code is factored
+  compute_mean_embedding: false # we obviously want per-residue embeddings
+
+  pos_weight_factor: 0.5
+
+  metadata:
+    nclasses: 5
+
+  data:
+    aws_base: 's3://deepchain-research/bio_clip/pesto-data/'
+    raw_data: 'contacts_rr5A_64nn_8192_wat.h5'
+    train_examples: 'subunits_train_set.txt'
+    test_examples: 'subunits_test_set.txt'
+    masif_baselines: 'masif_benchmark_ppi.json'
+    validation_examples: 'subunits_validation_set.txt'
+
+  neptune:
+    project_name: 'ResiduePPI'
+
+  sklearn:
+    class_weight: '' # '' becomes None

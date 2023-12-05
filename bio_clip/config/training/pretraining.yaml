@@ -1,0 +1,60 @@
+defaults:
+  - shared
+
+num_epochs: 1000
+train_esm_layers: false
+train_esm_from: 100 # the transformer block to train from, if negative it is from the end, set to >33 to not train esm
+mixed_precision: true
+optimiser:
+  optimiser_type: "adam"
+  learning_rate: 0.00015
+
+acc_batch_size: 1
+validation_freq: 5000
+
+target_type: "both"  # ["per-chain", "per-res", "both"]
+objective_type: "clip" # ["supervision", "clip"]
+
+num_samples_per_sequence: 16 # 16
+sample_each_sequence: false  # if false flatten batch and residues and then sample (false: sample wo replacement, true: sample with replacement)
+
+use_projected_sequence_embedding: false
+direct_supervision: false
+
+use_remat: false
+
+chunk_size: 16
+batch_size: 128
+batch_size_gnn_per_device: 16
+batch_size_esm_per_device: 16
+
+data:
+  aws_endpoint: 's3.kao-prod.instadeep.io'
+  cluster_size_path: "/app/bio-clip/datasets/pretraining/cluster_sizes.json"
+  train_set_path: "/app/bio-clip/datasets/pretraining/train_set.fasta"
+  val_set_path: "/app/bio-clip/datasets/pretraining/prefiltered_val_set_unif.fasta"
+  val_set_clust_path: "/app/bio-clip/datasets/pretraining/prefiltered_val_set_clust.fasta"
+  dataloader:
+    shuffle: false
+    use_weighted_sampling: false
+    conditional_cluster_sampling:
+      active: true
+      cluster_map_filepath: "/app/bio-clip/datasets/pretraining/clusterRes_cluster.tsv"
+      take_n_seq_per_cluster: 4
+  pre_shuffle_training_set: false  # this is only relevant when use_weighted_sampling is false
+
+checkpoints:
+  resume_from: '' # if "" this creates a new checkpoint
+  checkpoint_base: '/app/bio-clip/checkpoints/pretraining/'
+  aws_endpoint: ''
+  best_rel_path: "best_checkpoint"
+  latest_rel_path: "latest_checkpoint"
+  regular_rel_path: "step_{:d}"
+  latest_every: 100
+  regular_every: 2000
+
+neptune:
+  tags: []
+  user_name: 'InstaDeep'
+  project_name: 'BioCLIP'
+  experiment_name: 'CLIP pre-training'

@@ -1,0 +1,18 @@
+# Global
+.env
+.vscode/
+.idea/
+.ipynb_checkpoints/
+.DS_Store
+.mypy_cache/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pt
+*.fasta
+*.fna
+.pytest_cache/
+.neptune/
+
+checkpoint
+neptune_runs

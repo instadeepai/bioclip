@@ -1,0 +1,22 @@
+backend: "tpu"
+proportion_esm_layer: 1
+
+esm_embedding_size: 640
+
+batch_size_esm_per_device: 1 # currently this must be 1 because of the way the code is factored
+
+data:
+  fixed_sizes:
+    graph_max_neighbor: 16
+    maximum_padding: 1024
+    minimum_padding: 10
+  preprocessing:
+    pocket_cutoff: 8.0
+  datatransforms:
+    graph_residue_loc_is_alphac: true
+  dataloader:
+    num_process: 80
+    prefetch_factor: 4
+    max_num_epochs: 1
+    shuffle: false
+    max_num_consecutive_errors: 20

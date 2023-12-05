@@ -1,0 +1,6 @@
+use_positional_features: true
+use_edge_features: true
+use_residual_information: true  # amino acid feature
+use_mean_node_features: false # This is the cause of NaN's/infs.
+use_surface_aware_features: false  # This is the cause of NaN's/infs.
+sequence_embedding_type: "mean"

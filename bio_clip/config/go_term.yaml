@@ -1,0 +1,28 @@
+defaults:
+  - experiment
+
+# task specific config
+training:
+  compute_mean_embedding: true
+
+  optimiser:
+    learning_rate: 0.0001
+
+  num_epochs: 20
+  save_predictions_each_epoch: true
+
+  batch:
+    batch_size: 8
+    num_per_device_inference: 1
+    num_per_device_update: 1
+
+  data:
+    ontology: 'mf'  # 'mf,bp,cc,ec'
+    dataset_path: '/app/bio-clip/datasets/downstream/go_ec/sample/subset.h5'
+    baselines_path: '/app/bio-clip/datasets/downstream/go_ec/deepfri_baseline.npz'
+
+  neptune:
+    project_name: 'GOEC'
+
+  sklearn:
+    class_weight: '' # '' becomes None

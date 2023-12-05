@@ -1,0 +1,147 @@
+from typing import Optional, Tuple
+
+import haiku as hk
+import jax
+import jax.numpy as jnp
+import numpy as np
+from haiku._src.layer_norm import AxisOrAxes, to_abs_axes, to_axes_or_slice
+
+ERROR_IF_PARAM_AXIS_NOT_EXPLICIT = False
+
+
+class MaskedLayerNorm(hk.Module):
+    """MaskedLayerNorm module."""
+
+    def __init__(
+        self,
+        axis: AxisOrAxes,
+        create_scale: bool,
+        create_offset: bool,
+        eps: float = 1e-5,
+        scale_init: Optional[hk.initializers.Initializer] = None,
+        offset_init: Optional[hk.initializers.Initializer] = None,
+        name: Optional[str] = None,
+        *,
+        param_axis: Optional[AxisOrAxes] = None,
+    ):
+        """Constructs a LayerNorm module.
+
+        Args:
+          axis: Integer, list of integers, or slice indicating which axes to
+            normalize over. Note that the shape of the scale/offset parameters are
+            controlled by the ``param_axis`` argument.
+          create_scale: Bool, defines whether to create a trainable scale
+            per channel applied after the normalization.
+          create_offset: Bool, defines whether to create a trainable offset
+            per channel applied after normalization and scaling.
+          eps: Small epsilon to avoid division by zero variance. Defaults ``1e-5``,
+            as in the paper and Sonnet.
+          scale_init: Optional initializer for gain (aka scale). By default, one.
+          offset_init: Optional initializer for bias (aka offset). By default, zero.
+          name: The module name.
+          param_axis: Axis used to determine the parameter shape of the learnable
+            scale/offset. Sonnet sets this to the channel/feature axis (e.g. to
+            ``-1`` for ``NHWC``). Other libraries set this to the same as the
+            reduction axis (e.g. ``axis=param_axis``).
+        """
+        super().__init__(name=name)
+        if not create_scale and scale_init is not None:
+            raise ValueError("Cannot set `scale_init` if `create_scale=False`.")
+        if not create_offset and offset_init is not None:
+            raise ValueError("Cannot set `offset_init` if `create_offset=False`.")
+
+        self.axis = to_axes_or_slice(axis)
+        self.eps = eps
+        self.create_scale = create_scale
+        self.create_offset = create_offset
+        self.scale_init = scale_init or jnp.ones
+        self.offset_init = offset_init or jnp.zeros
+        self.param_axis = (-1,) if param_axis is None else to_axes_or_slice(param_axis)
+        self._param_axis_passed_explicitly = param_axis is not None
+
+    def __call__(
+        self,
+        inputs: jnp.ndarray,
+        mask: jnp.ndarray,
+        scale: Optional[jnp.ndarray] = None,
+        offset: Optional[jnp.ndarray] = None,
+    ) -> jnp.ndarray:
+        """Connects the layer norm.
+
+        Args:
+          inputs: An array, where the data format is ``[N, ..., C]``.
+          mask: An array indicating the mask (in the form [1....1,0...0])
+          scale: An array up to n-D. The shape of this tensor must be broadcastable
+            to the shape of ``inputs``. This is the scale applied to the normalized
+            inputs. This cannot be passed in if the module was constructed with
+            ``create_scale=True``.
+          offset: An array up to n-D. The shape of this tensor must be broadcastable
+            to the shape of ``inputs``. This is the offset applied to the normalized
+            inputs. This cannot be passed in if the module was constructed with
+            ``create_offset=True``.
+        Returns:
+          The array, normalized.
+        """
+        if self.create_scale and scale is not None:
+            raise ValueError("Cannot pass `scale` at call time if `create_scale=True`.")
+        if self.create_offset and offset is not None:
+            raise ValueError(
+                "Cannot pass `offset` at call time if `create_offset=True`."
+            )
+        axis = to_abs_axes(self.axis, inputs.ndim)
+        inputs = mask * inputs
+        mean = jnp.mean(
+            mask * inputs,
+            axis=axis,
+            keepdims=True,
+        )
+
+        variance = jnp.mean(
+            mask * ((inputs - mean) * (inputs - mean)),
+            axis=axis,
+            keepdims=True,
+        )
+
+        if (
+            self.create_scale or self.create_offset
+        ) and not self._param_axis_passed_explicitly:
+            if ERROR_IF_PARAM_AXIS_NOT_EXPLICIT and axis != (inputs.ndim - 1,):
+                raise ValueError(
+                    "When axis is not the final dimension we require "
+                    "you to also pass `param_axis` in the ctor."
+                    f" axis={axis} ndim={inputs.ndim}"
+                )
+
+        # Shape for the learnable scale and offset is the number of channels.
+        # See: https://arxiv.org/pdf/1803.08494.pdf around equation 6.
+        param_axis = to_abs_axes(self.param_axis, inputs.ndim)
+        if param_axis == (inputs.ndim - 1,):
+            # For param_axis=-1 we store non-broadcast param shape for compatibility
+            # with older checkpoints.
+            param_shape: Tuple[int, ...] = (inputs.shape[-1],)
+        else:
+            param_shape = tuple(
+                (inputs.shape[i] if i in param_axis else 1) for i in range(inputs.ndim)
+            )
+
+        if self.create_scale:
+            scale = hk.get_parameter(
+                "scale", param_shape, inputs.dtype, init=self.scale_init
+            )
+        elif scale is None:
+            scale = np.array(1.0, dtype=inputs.dtype)
+
+        if self.create_offset:
+            offset = hk.get_parameter(
+                "offset", param_shape, inputs.dtype, init=self.offset_init
+            )
+        elif offset is None:
+            offset = np.array(0.0, dtype=inputs.dtype)
+
+        scale = jnp.broadcast_to(scale, inputs.shape)
+        offset = jnp.broadcast_to(offset, inputs.shape)
+        mean = jnp.broadcast_to(mean, inputs.shape)
+
+        eps = jax.lax.convert_element_type(self.eps, variance.dtype)
+        inv = scale * jax.lax.rsqrt(variance + eps)
+        return inv * (inputs - mean) + offset
