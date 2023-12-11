@@ -132,7 +132,7 @@ class ThreadedIterable(Iterable[T]):
 def convert_to_ml_dict(dct: Union[DictConfig, Any]) -> Union[ConfigDict, Any]:
     """
     This function converts the DictConfig returned by Hydra
-    into a ConfigDict. The recusion allows to convert
+    into a ConfigDict. The recursion allows to convert
     all the nested DictConfig elements of the config. The recursion stops
     once the reached element is not a DictConfig.
     """

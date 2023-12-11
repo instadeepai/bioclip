@@ -480,7 +480,7 @@ def preprocess_atoms(
         atom14_mask.astype(np.float32),
     )
 
-    # I am cropping tokens manually here, because the filter guarentees the num residues
+    # I am cropping tokens manually here, because the filter guarantees the num residues
     # is below padding_num_residue
     tokens = tokens[:padding_num_residue]
 
