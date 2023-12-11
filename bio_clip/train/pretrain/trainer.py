@@ -342,7 +342,7 @@ class Trainer:
 
         Returns:
             loss (float):  Training Loss.
-            aux_metrics (dict): Auxillary metrics.
+            aux_metrics (dict): Auxiliary metrics.
         """
         mean = (
             jnp.mean

@@ -44,7 +44,7 @@ def clean_structure(structure):
     )[1]
     delta_chains = np.abs(np.sign(np.concatenate([[0], np.diff(ids_chains)])))
 
-    # find changes due to inertion code
+    # find changes due to insertion code
     icodes = structure["icode"]
     ids_icodes = np.where(
         np.array(icodes).reshape(-1, 1) == np.unique(icodes).reshape(1, -1)
