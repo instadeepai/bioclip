@@ -120,6 +120,10 @@ python /app/bio-clip/scripts/finetune/ppi.py training.data.benchmark=cerevisiae 
 
 To create a new downstream task you will need to create a function to load your data, an MLP head, loss function and metrics.
 
+## Acknowledgements
+
+This research was supported with Cloud TPUs from Google's TPU Research Cloud (TRC).
+
 ```bibtex
 @article{robinson2023bioclip,
 	author = {Louis Callum Butler Robinson and Timothy Atkinson and Liviu Copoiu and Patrick Bordes and Thomas Pierrot and Thomas Barrett},
