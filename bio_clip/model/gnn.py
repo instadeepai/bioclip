@@ -23,7 +23,7 @@ _GNN_layer_classes = {"GATLayer": GATLayer, "MPNNLayer": MPNNLayer}
 
 
 class PositionalEncodingLayer(hk.Module):
-    """Independent-Equivariant Graph Matching Newtork"""
+    """Independent-Equivariant Graph Matching Network"""
 
     def __init__(self, positional_encoding_dimension: int):
         """Initializes a Positional Encoding Layer

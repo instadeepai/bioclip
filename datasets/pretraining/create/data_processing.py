@@ -586,7 +586,7 @@ def compute_graph_of_protein(
             raw PDB data for the ligand sorted by residue
         stacked_residue_coordinates (Coordinates):
             list of residue coordinates for the ligand
-        num_neighbor (int, optional): number of nearest neigbors in the graph.
+        num_neighbor (int, optional): number of nearest neighbors in the graph.
             Defaults to None.
         residue_loc_is_alphac (bool, optional): whether the alpha-C atom
             is used for residue center. Defaults to True.
@@ -828,7 +828,7 @@ def get_residues_db5(pdb_filename: str) -> List[SortedPdbData]:
 
     Returns:
         List of residues, each residue being represented by:
-            chain, residue, resname and all atom informations
+            chain, residue, resname and all atom information
     """
     df = PandasPdb().read_pdb(pdb_filename)
     df = df.df["ATOM"]

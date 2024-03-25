@@ -122,7 +122,7 @@ def cropping_dependent_processing(
 ):
     """This task is now deprecated as there were problems found in the original paper.
     Additionally, this task was previously pre-processed using an old version of the
-    BioCLIP code which we do not provide. Data-transform dependend pre-processing takes
+    BioCLIP code which we do not provide. Data-transform dependent pre-processing takes
     quite long, thus it is processed in parallel, cached, then training is performed.
 
     Args:

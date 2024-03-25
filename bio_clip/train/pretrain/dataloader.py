@@ -25,7 +25,7 @@ class BioClipDataloaderParams:
     # files. The filepaths can be GCP bucket filepaths (in which case they should start
     # with gs://)
     batch_dims: Tuple[int, ...]  # Batches of training samples will be reshaped to this
-    # shape before being outputed (the effective batch size is np.prod(batch_dims)).
+    # shape before being outputted (the effective batch size is np.prod(batch_dims)).
     # This is useful for preparing the batches in a shape that matches what jax.pmap and
     # jax.vmap expect.
     shuffle: bool = True  # If True, shuffle the filepaths at the beginning of all
